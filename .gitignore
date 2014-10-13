@@ -3,3 +3,4 @@ PersonalTokens.java
 *.project
 .settings
 *.class
+*.metadata
