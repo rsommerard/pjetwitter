@@ -130,6 +130,8 @@ public class PJETwitter {
 		this.proxyUser = user;
 		this.proxyPassword = password;
 		
+		this.proxyUsed = true;
+		
 		return false;
 	}
 

@@ -300,11 +300,18 @@ public class Main {
 	}
 	
 	private void actionPerformedChckbxmntmUseProxy(ActionEvent e) {
-		//TODO
+		if(!this.chckbxmntmUseProxy.getState()) {
+			this.pjeTwitter.disableProxy();
+		}
+		else {
+			if(!this.pjeTwitter.enableProxy()) {
+				this.chckbxmntmUseProxy.setState(!this.chckbxmntmUseProxy.getState());
+			}
+		}
 	}
 	
 	private void actionPerformedMntmProxyProperties(ActionEvent e) {
-		//TODO
+		new Proxy(this.pjeTwitter, this.chckbxmntmUseProxy);
 	}
 	
 	private void actionPerformedBtnSearch(ActionEvent e) {
