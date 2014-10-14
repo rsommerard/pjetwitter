@@ -6,6 +6,7 @@ import java.awt.FlowLayout;
 import javax.swing.JButton;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JDialog;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
 
@@ -128,24 +129,31 @@ public class Proxy extends JDialog {
 	}
 	
 	private void actionPerformedCancelButton(ActionEvent e) {
-		this.setVisible(false);
+		this.dispose();
 	}
 	
 	private void actionPerformedOkButton(ActionEvent e) {
-		if(!isValidHost() || !isValidPort() || !isValidUser() || !isValidPassword()) {
+		if(!isValidHost() || !isValidPort()) {
+			JOptionPane.showMessageDialog(this, "Bad proxy settings.", "Proxy error.", JOptionPane.ERROR_MESSAGE);
 			return;
 		}
 		
-		char[] password = this.passwordFieldPassword.getPassword();
-		String passwordString = new String();
-		
-		for(char c : password) {
-			passwordString += c;
+		if(isValidUser() && isValidPassword()) {
+			char[] password = this.passwordFieldPassword.getPassword();
+			String passwordString = new String();
+			
+			for(char c : password) {
+				passwordString += c;
+			}
+			
+			this.pjeTwitter.addProxyConfig(this.textFieldHost.getText(), Integer.parseInt(this.textFieldPort.getText()), this.textFieldUser.getText(), passwordString);
+		}
+		else {
+			this.pjeTwitter.addProxyConfig(this.textFieldHost.getText(), Integer.parseInt(this.textFieldPort.getText()));
 		}
 		
-		this.pjeTwitter.addProxyConfig(this.textFieldHost.getText(), Integer.parseInt(this.textFieldPort.getText()), this.textFieldUser.getText(), passwordString);
 		this.chckbxmntmUseProxy.setState(true);
-		this.setVisible(false);
+		this.dispose();
 	}
 	
 	private boolean isValidHost() {

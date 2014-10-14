@@ -27,10 +27,10 @@ public class PJETwitter {
 	
 	public PJETwitter() {
 		this.proxyUsed = false;
-		this.proxyHost = "cache-etu.univ-lille1.fr";
+		this.proxyHost = "cacheserv.univ-lille1.fr";
 		this.proxyPort = 3128;
 		
-		this.countResult = 100;
+		this.countResult = 7;
 		
 		this.resultType = ResultType.mixed;
 	}
@@ -54,7 +54,7 @@ public class PJETwitter {
 	}
 	
 	public boolean enableProxy() {
-		if(this.isValidHost() && this.isValidPort() && this.isValidUser() && this.isValidPassword()) {
+		if(this.isValidHost() && this.isValidPort()) {
 			this.proxyUsed = true;
 			return true;
 		}
@@ -76,14 +76,6 @@ public class PJETwitter {
 	
 	private boolean isValidPort() {		
 		return (this.proxyPort >= 0) && (this.proxyPort <= 65535);
-	}
-	
-	private boolean isValidUser() {
-		return this.proxyUser != null && !this.proxyUser.isEmpty();
-	}
-	
-	private boolean isValidPassword() {
-		return this.proxyPassword != null && !this.proxyPassword.isEmpty();
 	}
 	
 	public String getProxyHost() {
@@ -133,6 +125,10 @@ public class PJETwitter {
 		this.proxyUsed = true;
 		
 		return false;
+	}
+	
+	public boolean addProxyConfig(String host, int port) {
+		return this.addProxyConfig(host, port, null, null);
 	}
 
 	public QueryResult search(String requestedWord) {

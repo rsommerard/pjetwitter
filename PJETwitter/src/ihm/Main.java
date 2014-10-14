@@ -1,5 +1,8 @@
 package ihm;
 
+import helper.Constants;
+import helper.CsvHelper;
+
 import java.awt.EventQueue;
 
 import javax.swing.DefaultListModel;
@@ -8,10 +11,17 @@ import javax.swing.JMenuBar;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JCheckBoxMenuItem;
+import javax.swing.JOptionPane;
 import javax.swing.JSeparator;
+import javax.swing.UIManager;
+import javax.swing.UIManager.LookAndFeelInfo;
+import javax.swing.UnsupportedLookAndFeelException;
 
+import java.awt.TrayIcon.MessageType;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 
 import javax.swing.JButton;
 
@@ -24,8 +34,11 @@ import javax.swing.border.TitledBorder;
 
 import java.awt.Dimension;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
 
 import javax.swing.JScrollPane;
 
@@ -35,19 +48,17 @@ import twitter4j.QueryResult;
 import twitter4j.Status;
 
 import javax.swing.ListSelectionModel;
-
 import javax.swing.JLabel;
 
 import java.awt.FlowLayout;
 
 import javax.swing.ScrollPaneConstants;
-
 import javax.swing.JTextArea;
-
 import javax.swing.JComboBox;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.event.ListSelectionEvent;
+import javax.swing.AbstractListModel;
 
 public class Main {
 
@@ -102,8 +113,30 @@ public class Main {
 
 	/**
 	 * Launch the application.
+	 * @throws UnsupportedLookAndFeelException 
+	 * @throws IllegalAccessException 
+	 * @throws InstantiationException 
+	 * @throws ClassNotFoundException 
 	 */
-	public static void main(String[] args) {
+	public static void main(String[] args) throws Exception {
+		for (LookAndFeelInfo info : UIManager.getInstalledLookAndFeels())
+		{
+			if ("Nimbus".equals(info.getName()))
+			{
+				UIManager.setLookAndFeel(info.getClassName());
+				break;
+			}
+		}
+		
+		/*for (LookAndFeelInfo info : UIManager.getInstalledLookAndFeels())
+		{
+			if ("Mac OS X".equals(info.getName()))
+			{
+				UIManager.setLookAndFeel(info.getClassName());
+				break;
+			}
+		}*/
+		
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {
@@ -266,7 +299,15 @@ public class Main {
 		this.panelTweetDetails.add(this.lblTweetIdValue);
 		
 		this.comboBoxTweetPolarity = new JComboBox();
-		this.comboBoxTweetPolarity.setModel(new DefaultComboBoxModel(new String[] {"Not Anotated", "Negative", "Neutral", "Positive"}));
+		comboBoxTweetPolarity.addItemListener((new ItemListener() {
+			@Override
+			public void itemStateChanged(ItemEvent e)
+			{
+				itemStateChangedComboBoxTweetPolarity(e);				
+			}
+		}));
+		this.comboBoxTweetPolarity.setModel(new DefaultComboBoxModel(
+				new String[] {Constants.NON_ANNOTATED_TWEET_STR, Constants.NEGATIVE_TWEET_STR, Constants.NEUTRAL_TWEET_STR, Constants.POSITIVE_TWEET_STR}));
 		this.comboBoxTweetPolarity.setBounds(115, 134, 140, 50);
 		this.panelTweetDetails.add(this.comboBoxTweetPolarity);
 		
@@ -276,7 +317,7 @@ public class Main {
 		this.frame.getContentPane().add(this.panelTweets, BorderLayout.WEST);
 		
 		this.scrollPaneTweets = new JScrollPane();
-		this.scrollPaneTweets.setPreferredSize(new Dimension(165, 380));
+		this.scrollPaneTweets.setPreferredSize(new Dimension(180, 380));
 		this.scrollPaneTweets.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
 		this.panelTweets.add(this.scrollPaneTweets);
 		
@@ -291,6 +332,33 @@ public class Main {
 		this.listTweets.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 	}
 	
+	private void itemStateChangedComboBoxTweetPolarity(ItemEvent event)
+	{
+		if (event.getStateChange() == ItemEvent.SELECTED)
+		{
+			if (this.tweets.size() == 0 || listTweets.getModel().getSize() == 0 || this.tweets.size() != listTweets.getModel().getSize())
+			{
+				System.out.println("[WARN] Event called without objects");
+				return;
+			}
+			
+			Object item = event.getItem();
+			System.out.println("Combobox selected value: " + item.toString());
+
+			TweetInfo tweet = this.tweets.get(listTweets.getSelectedValue());
+
+
+			if (item.toString().equals(Constants.NEGATIVE_TWEET_STR))
+				tweet.setTweetPolarity(Constants.NEGATIVE_TWEET);
+			else if (item.toString().equals(Constants.NEUTRAL_TWEET_STR))
+				tweet.setTweetPolarity(Constants.NEUTRAL_TWEET);
+			else if (item.toString().equals(Constants.POSITIVE_TWEET_STR))
+				tweet.setTweetPolarity(Constants.POSITIVE_TWEET);
+			else
+				tweet.setTweetPolarity(Constants.NON_ANNOTATED_TWEET);
+
+		}
+	}
 	private void actionPerformedMntmExit(ActionEvent e) {
 		System.exit(0);
 	}
@@ -306,6 +374,7 @@ public class Main {
 		else {
 			if(!this.pjeTwitter.enableProxy()) {
 				this.chckbxmntmUseProxy.setState(!this.chckbxmntmUseProxy.getState());
+				JOptionPane.showMessageDialog(this.frame, "Bad proxy settings.", "Proxy error.", JOptionPane.WARNING_MESSAGE);
 			}
 		}
 	}
@@ -316,6 +385,7 @@ public class Main {
 	
 	private void actionPerformedBtnSearch(ActionEvent e) {
 		if(this.txtSearch.getText().isEmpty()) {
+			JOptionPane.showMessageDialog(this.frame, "You need to search a word.", "No Requested word", JOptionPane.WARNING_MESSAGE);
 			return;
 		}
 		
@@ -326,7 +396,8 @@ public class Main {
 
 		QueryResult result = this.pjeTwitter.search(this.txtSearch.getText());
 		
-		if(result == null) {
+		if(result == null || result.getTweets().size() == 0) {
+			JOptionPane.showMessageDialog(this.frame, "No result were found.", "No Result", JOptionPane.ERROR_MESSAGE);
 			return;
 		}
 		
@@ -340,12 +411,29 @@ public class Main {
 			this.tweets.put(tweet.getTweetID(), tweet);
 			model.addElement(tweet.getTweetID());
 		}
-			
+
 		this.listTweets.setModel(model);
 	}
 	
-	private void actionPerformedBtnSave(ActionEvent e) {
-		//TODO
+	private void actionPerformedBtnSave(ActionEvent e)
+	{
+		if (this.tweets.size() == 0 || listTweets.getModel().getSize() == 0 || this.tweets.size() != listTweets.getModel().getSize())
+		{
+			System.out.println("[ERR] Cannot save tweets");
+			return;
+		}
+
+		CsvHelper csv = new CsvHelper(Constants.CSV_FINAL_LOCATION, Constants.CSV_DELIMITER);
+
+		Set<Entry<Long, TweetInfo>> set = tweets.entrySet();
+		Iterator<Entry<Long, TweetInfo>> i = set.iterator();
+		while (i.hasNext())
+		{
+			Map.Entry me = (Map.Entry) i.next();
+			// Write to csv
+			TweetInfo tweet = (TweetInfo) me.getValue();
+			csv.write(tweet, true);
+		}
 	}
 	
 	private void valueChangedListTweets(ListSelectionEvent e) {
@@ -358,18 +446,24 @@ public class Main {
 			this.lblTweetDateValue.setText(tweet.getTweetDate().toString());
 			this.textAreaTweetMessage.setText(tweet.getTweetText());
 			
-			if(tweet.getTweetPolarity() == -1) {
-				this.comboBoxTweetPolarity.setSelectedItem("Not Anotated");
+			
+			if (tweet.getTweetPolarity() == Constants.POSITIVE_TWEET)
+			{
+				this.comboBoxTweetPolarity.setSelectedItem(Constants.POSITIVE_TWEET_STR);
 			}
-			else if(tweet.getTweetPolarity() == 0) {
-				this.comboBoxTweetPolarity.setSelectedItem("Negative");
+			else if (tweet.getTweetPolarity() == Constants.NEGATIVE_TWEET)
+			{
+				this.comboBoxTweetPolarity.setSelectedItem(Constants.NEGATIVE_TWEET_STR);
 			}
-			else if(tweet.getTweetPolarity() == 1) {
-				this.comboBoxTweetPolarity.setSelectedItem("Neutral");
+			else if (tweet.getTweetPolarity() == Constants.NEUTRAL_TWEET)
+			{
+				this.comboBoxTweetPolarity.setSelectedItem(Constants.NEUTRAL_TWEET_STR);
 			}
-			else {
-				this.comboBoxTweetPolarity.setSelectedItem("Positive");
+			else
+			{
+				this.comboBoxTweetPolarity.setSelectedItem(Constants.NON_ANNOTATED_TWEET_STR);
 			}
+			
 	    }
 	}
 }

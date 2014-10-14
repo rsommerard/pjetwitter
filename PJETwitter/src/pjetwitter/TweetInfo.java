@@ -6,6 +6,11 @@ import twitter4j.Status;
 
 public class TweetInfo
 {
+	public void setTweetPolarity(int tweetPolarity)
+	{
+		this.tweetPolarity = tweetPolarity;
+	}
+
 	long tweetID;
 	String tweetPublisher;
 	String tweetText;
