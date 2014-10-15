@@ -1,4 +1,5 @@
 package helper;
+
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -29,10 +30,11 @@ public class CsvHelper
 		this.csv_delimiter = csv_delimiter;
 	}
 
-
-
 	public void write(long id, String user, String text, Date date, String usedRequest, int tweetPolarity, boolean clean)
 	{
+		if(idExist(id))
+			return;
+		
 		String outputFile = csv_location;
 
 		// before we open the file check to see if it already exists
@@ -56,9 +58,7 @@ public class CsvHelper
 				csvOutput.endRecord();
 			}
 			// else assume that the file already has the correct header line
-
-			SimpleDateFormat sdf = new SimpleDateFormat(Constants.DATE_FORMAT);
-			String dateFormatee = sdf.format(date);
+			String dateFormatee = Utils.DateToString(date);
 
 			csvOutput.write(String.valueOf(id));
 			csvOutput.write(user);
@@ -73,7 +73,6 @@ public class CsvHelper
 			csvOutput.write(String.valueOf(tweetPolarity));
 			csvOutput.endRecord();
 
-
 			csvOutput.close();
 		}
 		catch (IOException e)
@@ -87,8 +86,6 @@ public class CsvHelper
 		write(tweet.getTweetID(), tweet.getTweetPublisher(), tweet.getTweetText(), tweet.getTweetDate(), tweet.getUsedRequest(),
 				tweet.getTweetPolarity(), clean);
 	}
-
-
 
 	public List<TweetInfo> readAll()
 	{
@@ -123,6 +120,34 @@ public class CsvHelper
 
 		return listeTweets;
 	}
+		
+
+	public boolean idExist(long id)
+	{
+		try
+		{
+			CsvReader products = new CsvReader(csv_location, csv_delimiter);
+
+			products.readHeaders();
+
+			while (products.readRecord())
+			{
+				long tweetID = Long.valueOf(products.get("TweetID"));
+				if (tweetID == id)
+					return true;
+			}
+
+			products.close();
+
+		}
+		catch (Exception e)
+		{
+			e.printStackTrace();
+		}
+		
+		return false;
+	}
+
 
 
 

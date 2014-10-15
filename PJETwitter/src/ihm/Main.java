@@ -299,13 +299,12 @@ public class Main {
 		this.panelTweetDetails.add(this.lblTweetIdValue);
 		
 		this.comboBoxTweetPolarity = new JComboBox();
-		comboBoxTweetPolarity.addItemListener((new ItemListener() {
-			@Override
+		comboBoxTweetPolarity.addItemListener(new ItemListener() {
 			public void itemStateChanged(ItemEvent e)
 			{
 				itemStateChangedComboBoxTweetPolarity(e);				
 			}
-		}));
+		});
 		this.comboBoxTweetPolarity.setModel(new DefaultComboBoxModel(
 				new String[] {Constants.NON_ANNOTATED_TWEET_STR, Constants.NEGATIVE_TWEET_STR, Constants.NEUTRAL_TWEET_STR, Constants.POSITIVE_TWEET_STR}));
 		this.comboBoxTweetPolarity.setBounds(115, 134, 140, 50);
@@ -364,7 +363,7 @@ public class Main {
 	}
 	
 	private void actionPerformedMntmRequestProperties(ActionEvent e) {
-		//TODO
+		new Request(this.pjeTwitter);
 	}
 	
 	private void actionPerformedChckbxmntmUseProxy(ActionEvent e) {
@@ -411,8 +410,12 @@ public class Main {
 			this.tweets.put(tweet.getTweetID(), tweet);
 			model.addElement(tweet.getTweetID());
 		}
+		
+		//TODO: Exception ici. Recherche 100 puis recherche 1 par ex.
 
 		this.listTweets.setModel(model);
+		
+		this.listTweets.setSelectedIndex(0);
 	}
 	
 	private void actionPerformedBtnSave(ActionEvent e)

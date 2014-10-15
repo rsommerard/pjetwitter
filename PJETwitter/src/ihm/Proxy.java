@@ -27,6 +27,8 @@ import pjetwitter.PJETwitter;
 import java.awt.GridLayout;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.swing.SwingConstants;
 
@@ -48,6 +50,7 @@ public class Proxy extends JDialog {
 	private PJETwitter pjeTwitter;
 
 	public Proxy(PJETwitter pjeTwitter, JCheckBoxMenuItem chckbxmntmUseProxy) {
+		setResizable(false);
 		this.pjeTwitter = pjeTwitter;
 		this.chckbxmntmUseProxy = chckbxmntmUseProxy;
 		this.initialize();
@@ -165,7 +168,11 @@ public class Proxy extends JDialog {
 			return false;
 		}
 		
-		//TODO: vérifier si number.
+		Pattern pattern = Pattern.compile("\\D");
+		Matcher matcher = pattern.matcher(this.textFieldPort.getText());
+		if (matcher.find()) {
+			return false;
+		}
 		
 		int port = Integer.parseInt(this.textFieldPort.getText());
 		

@@ -30,7 +30,7 @@ public class PJETwitter {
 		this.proxyHost = "cacheserv.univ-lille1.fr";
 		this.proxyPort = 3128;
 		
-		this.countResult = 7;
+		this.countResult = 100;
 		
 		this.resultType = ResultType.mixed;
 	}
@@ -99,12 +99,14 @@ public class PJETwitter {
 	}
 	
 	public void setCountResult(int countResult) {
-		if(countResult > 0) {
-			this.countResult = countResult;
-		}
-		
 		if(countResult > 100) {
 			this.countResult = 100;
+		}
+		else if(countResult > 0) {
+			this.countResult = countResult;
+		}
+		else {
+			this.countResult = 1;
 		}
 	}
 	
