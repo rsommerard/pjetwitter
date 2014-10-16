@@ -24,6 +24,7 @@ public class PJETwitter {
 	
 	private int countResult;
 	private ResultType resultType;
+	private String lang;
 	
 	public PJETwitter() {
 		this.proxyUsed = false;
@@ -31,6 +32,7 @@ public class PJETwitter {
 		this.proxyPort = 3128;
 		
 		this.countResult = 100;
+		this.lang = "fr";
 		
 		this.resultType = ResultType.mixed;
 	}
@@ -110,6 +112,14 @@ public class PJETwitter {
 		}
 	}
 	
+	public String getLang() {
+		return this.lang;
+	}
+	
+	public void setLang(String lang) {
+		this.lang = lang;
+	}
+	
 	public ResultType getResultType() {
 		return this.resultType;
 	}
@@ -141,6 +151,8 @@ public class PJETwitter {
 			Query query = new Query(requestedWord);
 			
 			query.setResultType(this.resultType);
+			
+			query.setLang(this.lang);
 			
 			query.setCount(this.countResult);
 

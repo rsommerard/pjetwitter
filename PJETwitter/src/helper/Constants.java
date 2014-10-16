@@ -25,5 +25,7 @@ public class Constants
 	public final static String NEUTRAL_TWEET_STR = "Neutral";
 	public final static String POSITIVE_TWEET_STR = "Positive";
 	
-
+	public final static String LANG_ALL = "All";
+	public final static String LANG_EN = "English";
+	public final static String LANG_FR = "French";
 }
