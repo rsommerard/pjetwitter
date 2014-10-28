@@ -22,7 +22,6 @@ public class Utils
 		return null;
 	}
 
-
 	public static List<TweetInfo> removeAlreadyAnnotatedTweetsFrom(List<TweetInfo> liste)
 	{
 		CsvHelper finalCsv = new CsvHelper(Constants.CSV_FINAL_LOCATION, Constants.CSV_DELIMITER);
@@ -41,7 +40,6 @@ public class Utils
 		return retour;
 
 	}
-
 
 	public static Date stringToDate(String sDate) throws Exception
 	{

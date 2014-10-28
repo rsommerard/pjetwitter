@@ -18,15 +18,6 @@ public class TweetInfo
 	String usedRequest;
 	int tweetPolarity;
 
-
-	/**
-	 * @param tweetID
-	 * @param tweetPublisher
-	 * @param tweetText
-	 * @param tweetDate
-	 * @param usedRequest
-	 * @param tweetPolarity
-	 */
 	public TweetInfo(long tweetID, String tweetPublisher, String tweetText, Date tweetDate, String usedRequest, int tweetPolarity)
 	{
 		this.tweetID = tweetID;

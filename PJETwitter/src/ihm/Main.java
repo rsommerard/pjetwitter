@@ -42,6 +42,7 @@ import java.util.Set;
 
 import javax.swing.JScrollPane;
 
+import pjetwitter.KeywordsClassifier;
 import pjetwitter.PJETwitter;
 import pjetwitter.TweetInfo;
 import twitter4j.QueryResult;
@@ -449,7 +450,6 @@ public class Main {
 			this.lblTweetDateValue.setText(tweet.getTweetDate().toString());
 			this.textAreaTweetMessage.setText(tweet.getTweetText());
 			
-			
 			if (tweet.getTweetPolarity() == Constants.POSITIVE_TWEET)
 			{
 				this.comboBoxTweetPolarity.setSelectedItem(Constants.POSITIVE_TWEET_STR);
@@ -466,7 +466,6 @@ public class Main {
 			{
 				this.comboBoxTweetPolarity.setSelectedItem(Constants.NON_ANNOTATED_TWEET_STR);
 			}
-			
 	    }
 	}
 }

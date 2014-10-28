@@ -3,7 +3,8 @@ package helper;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.text.SimpleDateFormat;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
@@ -31,19 +32,23 @@ public class CsvHelper
 		this.csv_delimiter = csv_delimiter;
 	}
 
-	public void write(long id, String user, String text, Date date, String usedRequest, int tweetPolarity, boolean clean)
+	public void write(long id, String user, String text, Date date, String usedRequest, int tweetPolarity, boolean clean) throws Exception
 	{
-		if(idExist(id))
-			return;
-		
 		String outputFile = csv_location;
 
 		// before we open the file check to see if it already exists
 		boolean alreadyExists = new File(outputFile).exists();
-
-		try
-		{
+		
+		if(!alreadyExists) {
+			File file = new File(outputFile);
+			file.createNewFile();
+		}
+		
+		if(idExist(id))
+			return;
+		
 			// use FileWriter constructor that specifies open for appending
+			
 			CsvWriter csvOutput = new CsvWriter(new FileWriter(outputFile, true), csv_delimiter);
 
 			// if the file didn't already exist then we need to write out the
@@ -75,17 +80,16 @@ public class CsvHelper
 			csvOutput.endRecord();
 
 			csvOutput.close();
-		}
-		catch (IOException e)
-		{
-			e.printStackTrace();
-		}
 	}
 
 	public void write(TweetInfo tweet, boolean clean)
 	{
-		write(tweet.getTweetID(), tweet.getTweetPublisher(), tweet.getTweetText(), tweet.getTweetDate(), tweet.getUsedRequest(),
-				tweet.getTweetPolarity(), clean);
+		try {
+			write(tweet.getTweetID(), tweet.getTweetPublisher(), tweet.getTweetText(), tweet.getTweetDate(), tweet.getUsedRequest(),
+					tweet.getTweetPolarity(), clean);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 
 	public List<TweetInfo> readAll()
