@@ -1,8 +1,5 @@
-PersonalTokens.java
 *.classpath
 *.project
 .settings
 *.class
 *.metadata
-
-PJETwitter/src/pjetwitter/PersonalTokens.java
