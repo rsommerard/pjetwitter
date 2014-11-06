@@ -1,7 +1,9 @@
 package ihm;
 
 import helper.Constants;
-import helper.CsvHelper;
+import helper.Utils;
+import helper.csv.CsvHelper;
+import helper.csv.CsvSingletons;
 
 import java.awt.EventQueue;
 
@@ -17,7 +19,6 @@ import javax.swing.UIManager;
 import javax.swing.UIManager.LookAndFeelInfo;
 import javax.swing.UnsupportedLookAndFeelException;
 
-import java.awt.TrayIcon.MessageType;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 import java.awt.event.ItemEvent;
@@ -33,8 +34,8 @@ import javax.swing.JList;
 import javax.swing.border.TitledBorder;
 
 import java.awt.Dimension;
+import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -42,7 +43,6 @@ import java.util.Set;
 
 import javax.swing.JScrollPane;
 
-import pjetwitter.KeywordsClassifier;
 import pjetwitter.PJETwitter;
 import pjetwitter.TweetInfo;
 import twitter4j.QueryResult;
@@ -59,7 +59,6 @@ import javax.swing.JComboBox;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.event.ListSelectionEvent;
-import javax.swing.AbstractListModel;
 
 public class Main {
 
@@ -109,6 +108,7 @@ public class Main {
 	private JScrollPane scrollPaneTweets;
 	
 	private Map<Long, TweetInfo> tweets;
+	private List<TweetInfo> tweetInfoList;
 	
 	private PJETwitter pjeTwitter;
 
@@ -161,6 +161,7 @@ public class Main {
 	private void initializeVariables() {
 		this.pjeTwitter = new PJETwitter();
 		this.tweets = new HashMap<Long, TweetInfo>();
+		this.tweetInfoList = new ArrayList<TweetInfo>();
 	}
 
 	/**
@@ -392,6 +393,7 @@ public class Main {
 		DefaultListModel<Long> model = new DefaultListModel<Long>();
 		
 		this.tweets.clear();
+		this.tweetInfoList.clear();
 		model.clear();
 
 		QueryResult result = this.pjeTwitter.search(this.txtSearch.getText());
@@ -408,11 +410,19 @@ public class Main {
 		
 		for(int i = 0; i < this.pjeTwitter.getCountResult() && i < status.size(); i++) {
 			TweetInfo tweet = new TweetInfo(status.get(i), this.txtSearch.getText());
+			this.tweetInfoList.add(tweet);
+		}
+		
+		List<TweetInfo> tweetInfoIntern = new ArrayList<TweetInfo>(this.tweetInfoList);
+
+		Utils.removeAlreadyAnnotatedTweetsFrom(tweetInfoIntern);
+		
+		for(TweetInfo tweet : tweetInfoIntern) {
 			this.tweets.put(tweet.getTweetID(), tweet);
 			model.addElement(tweet.getTweetID());
 		}
 		
-		//TODO: Exception ici. Recherche 100 puis recherche 1 par ex.
+		System.out.println(this.tweets.size());
 
 		this.listTweets.setModel(model);
 		
@@ -427,28 +437,45 @@ public class Main {
 			return;
 		}
 
-		CsvHelper csv = new CsvHelper(Constants.CSV_FINAL_LOCATION, Constants.CSV_DELIMITER);
+		CsvHelper csvReference =  CsvSingletons.getInstance().referenceCsv;
 
-		Set<Entry<Long, TweetInfo>> set = tweets.entrySet();
-		Iterator<Entry<Long, TweetInfo>> i = set.iterator();
-		while (i.hasNext())
+		Set<Entry<Long, TweetInfo>> set = this.tweets.entrySet();
+		for (Entry<Long, TweetInfo> entry : set)
 		{
-			Map.Entry me = (Map.Entry) i.next();
-			// Write to csv
-			TweetInfo tweet = (TweetInfo) me.getValue();
-			csv.write(tweet, true);
+			TweetInfo tweet = entry.getValue();
+			if (tweet.getTweetPolarity() != Constants.NON_ANNOTATED_TWEET)
+			{
+				csvReference.write(tweet, true);
+			}
 		}
+		
+		// Tout sauver en base
+		CsvHelper csvBase =  CsvSingletons.getInstance().baseCsv;
+		List<TweetInfo> oldBase = csvBase.readAll();
+		List<TweetInfo> api = this.tweetInfoList;		
+		Utils.createNewBaseFrom(oldBase, api);
+
+		
+		JOptionPane.showMessageDialog(this.frame, "Save success.", "Success", JOptionPane.INFORMATION_MESSAGE);
+		
 	}
 	
 	private void valueChangedListTweets(ListSelectionEvent e) {
 		if (!e.getValueIsAdjusting()) {
 			JList list = (JList)e.getSource();
-			
+
 			TweetInfo tweet = this.tweets.get(list.getSelectedValue());
+			
+			if(tweet == null) {
+				return;
+			}
+			
 			this.lblTweetIdValue.setText(String.valueOf(tweet.getTweetID()));
 			this.lblTweetPublisherValue.setText(tweet.getTweetPublisher());
 			this.lblTweetDateValue.setText(tweet.getTweetDate().toString());
 			this.textAreaTweetMessage.setText(tweet.getTweetText());
+			
+			System.out.println("tweet.getTweetPolarity(): " + tweet.getTweetPolarity());
 			
 			if (tweet.getTweetPolarity() == Constants.POSITIVE_TWEET)
 			{

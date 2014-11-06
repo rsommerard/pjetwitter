@@ -11,8 +11,14 @@ public class Constants
 
 
 	public final static String CSV_BASE_LOCATION = "data/base.csv";
+	public final static String CSV_REFERENCE_LOCATION = "data/reference.csv";
 	public final static String CSV_FINAL_LOCATION = "data/final.csv";
 	public final static char CSV_DELIMITER = ';';
+	
+	
+
+	public final static String POSITIVE_FILE_PATH = "data/positive.txt";
+	public final static String NEGATIVE_FILE_PATH = "data/negative.txt";
 	
 
 	public final static int NON_ANNOTATED_TWEET = 1;

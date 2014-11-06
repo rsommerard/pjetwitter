@@ -133,7 +133,7 @@ public class Request extends JDialog {
 		else {
 			this.pjeTwitter.setLang(null);
 		}
-		this.pjeTwitter.setCountResult((int)this.spinnerCount.getValue());
+		this.pjeTwitter.setCountResult((Integer)this.spinnerCount.getValue());
 		this.pjeTwitter.setResultType((ResultType)this.comboBoxResultType.getSelectedItem());
 		
 		this.dispose();

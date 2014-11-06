@@ -1,10 +1,12 @@
 package pjetwitter;
 
+import helper.Constants;
+
 import java.util.Date;
 
 import twitter4j.Status;
 
-public class TweetInfo
+public class TweetInfo implements Comparable<TweetInfo>, Cloneable
 {
 	public void setTweetPolarity(int tweetPolarity)
 	{
@@ -27,9 +29,11 @@ public class TweetInfo
 		this.usedRequest = usedRequest;
 		this.tweetPolarity = tweetPolarity;
 	}
-	
-	public TweetInfo(Status status, String usedRequest) {
-		this(status.getId(), status.getUser().getScreenName(), status.getText(), status.getCreatedAt(), usedRequest, -1);
+
+
+	public TweetInfo(Status status, String usedRequest)
+	{
+		this(status.getId(), status.getUser().getScreenName(), status.getText(), status.getCreatedAt(), usedRequest, Constants.NON_ANNOTATED_TWEET);
 	}
 
 	public long getTweetID()
@@ -68,5 +72,35 @@ public class TweetInfo
 		return "[" + tweetID + " - " + tweetPublisher + " - " + tweetText + " - " + tweetDate + " - " + usedRequest + " - " + tweetPolarity + "]";
 	}
 
+
+	@Override
+	/**
+	 * Retourne 0 si les tweets ont les mêmes IDs
+	 */
+	public int compareTo(TweetInfo o)
+	{
+		if (this.tweetID < o.tweetID)
+			return -1;
+		else if (this.tweetID > o.tweetID)
+			return 1;
+		else
+			return 0;
+	}
+
+
+	@Override
+	public Object clone()
+	{
+		TweetInfo jouet = null;
+		try
+		{
+			jouet = (TweetInfo) super.clone();
+		}
+		catch (CloneNotSupportedException cnse)
+		{
+			cnse.printStackTrace(System.err);
+		}
+		return jouet;
+	}
 
 }
