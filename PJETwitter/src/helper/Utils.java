@@ -83,8 +83,6 @@ public class Utils
 		// suppression de base.csv avant la réecriture (éviter le appendFile)
 		csv.deleteIfExists();
 
-
-		// !!! write vérifie si idExists. Comme il y-a cache, idExists=true, aucune ecriture alors qu'il devrait
 		for (TweetInfo tweet : newTweets)
 		{
 			csv.write(tweet, false);

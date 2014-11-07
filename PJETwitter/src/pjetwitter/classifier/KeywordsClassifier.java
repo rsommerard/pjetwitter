@@ -11,12 +11,16 @@ public class KeywordsClassifier {
     private List<String> positiveWords;
     private List<String> negativeWords;
     
-    public KeywordsClassifier() throws Exception {
+    public KeywordsClassifier() {
     	this.positiveWords = new ArrayList<String>();
     	this.negativeWords = new ArrayList<String>();
     	
-    	this.loadWords(Constants.POSITIVE_FILE_PATH);
-    	this.loadWords(Constants.NEGATIVE_FILE_PATH);
+    	try
+    	{
+    		this.loadWords(Constants.POSITIVE_FILE_PATH);
+        	this.loadWords(Constants.NEGATIVE_FILE_PATH);
+    	}
+    	catch(Exception e) { }
     }
     
     private void loadWords(String filePath) throws Exception {
@@ -64,5 +68,16 @@ public class KeywordsClassifier {
     	}
     	
     	return Constants.NEUTRAL_TWEET;
+    }
+    
+    public static void main(String[] args) {
+    	String tweet1 = "This is a tweet.";
+    	String tweet2 = "This is a second good tweet.";
+    	String tweet3 = "This is a second bad tweet.";
+    	
+    	System.out.println("NON_ANNOTATED_TWEET = 1, NEGATIVE_TWEET = 0, NEUTRAL_TWEET = 2, POSITIVE_TWEET = 4");
+    	System.out.println("tweet1: \"" + tweet1 + "\" = " + new KeywordsClassifier().classify(tweet1));
+    	System.out.println("tweet2: \"" + tweet2 + "\" = " + new KeywordsClassifier().classify(tweet2));
+    	System.out.println("tweet3: \"" + tweet3 + "\" = " + new KeywordsClassifier().classify(tweet3));
     }
 }
