@@ -1,6 +1,6 @@
 package ihm;
 
-import helper.Constants;
+import helper.Globals;
 
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;
@@ -78,13 +78,13 @@ public class Request extends JDialog {
 		this.comboBoxLang = new JComboBox();
 		this.comboBoxLang.setModel(new DefaultComboBoxModel(new String[] {"All", "English", "French"}));
 		if(this.pjeTwitter.getLang().equals("fr")) {
-			this.comboBoxLang.setSelectedItem(Constants.LANG_FR);
+			this.comboBoxLang.setSelectedItem(Globals.LANG_FR);
 		}
 		else if(this.pjeTwitter.getLang().equals("en")) {
-			this.comboBoxLang.setSelectedItem(Constants.LANG_EN);
+			this.comboBoxLang.setSelectedItem(Globals.LANG_EN);
 		}
 		else {
-			this.comboBoxLang.setSelectedItem(Constants.LANG_ALL);
+			this.comboBoxLang.setSelectedItem(Globals.LANG_ALL);
 		}
 		this.comboBoxLang.setBounds(120, 87, 200, 27);
 		this.contentPanel.add(this.comboBoxLang);
@@ -124,10 +124,10 @@ public class Request extends JDialog {
 	}
 	
 	private void actionPerformedOkButton(ActionEvent e) {
-		if(this.comboBoxLang.getSelectedItem().toString().equals(Constants.LANG_FR)) {
+		if(this.comboBoxLang.getSelectedItem().toString().equals(Globals.LANG_FR)) {
 			this.pjeTwitter.setLang("fr");
 		}
-		else if(this.comboBoxLang.getSelectedItem().toString().equals(Constants.LANG_EN)) {
+		else if(this.comboBoxLang.getSelectedItem().toString().equals(Globals.LANG_EN)) {
 			this.pjeTwitter.setLang("en");
 		}
 		else {

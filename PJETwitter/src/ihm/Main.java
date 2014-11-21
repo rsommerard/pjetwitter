@@ -1,6 +1,6 @@
 package ihm;
 
-import helper.Constants;
+import helper.Globals;
 import helper.Utils;
 import helper.csv.CsvHelper;
 import helper.csv.CsvSingletons;
@@ -129,14 +129,14 @@ public class Main {
 			}
 		}
 		
-		/*for (LookAndFeelInfo info : UIManager.getInstalledLookAndFeels())
+		for (LookAndFeelInfo info : UIManager.getInstalledLookAndFeels())
 		{
 			if ("Mac OS X".equals(info.getName()))
 			{
 				UIManager.setLookAndFeel(info.getClassName());
 				break;
 			}
-		}*/
+		}
 		
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
@@ -308,7 +308,7 @@ public class Main {
 			}
 		});
 		this.comboBoxTweetPolarity.setModel(new DefaultComboBoxModel(
-				new String[] {Constants.NON_ANNOTATED_TWEET_STR, Constants.NEGATIVE_TWEET_STR, Constants.NEUTRAL_TWEET_STR, Constants.POSITIVE_TWEET_STR}));
+				new String[] {Globals.NON_ANNOTATED_TWEET_STR, Globals.NEGATIVE_TWEET_STR, Globals.NEUTRAL_TWEET_STR, Globals.POSITIVE_TWEET_STR}));
 		this.comboBoxTweetPolarity.setBounds(115, 134, 140, 50);
 		this.panelTweetDetails.add(this.comboBoxTweetPolarity);
 		
@@ -349,14 +349,14 @@ public class Main {
 			TweetInfo tweet = this.tweets.get(listTweets.getSelectedValue());
 
 
-			if (item.toString().equals(Constants.NEGATIVE_TWEET_STR))
-				tweet.setTweetPolarity(Constants.NEGATIVE_TWEET);
-			else if (item.toString().equals(Constants.NEUTRAL_TWEET_STR))
-				tweet.setTweetPolarity(Constants.NEUTRAL_TWEET);
-			else if (item.toString().equals(Constants.POSITIVE_TWEET_STR))
-				tweet.setTweetPolarity(Constants.POSITIVE_TWEET);
+			if (item.toString().equals(Globals.NEGATIVE_TWEET_STR))
+				tweet.setTweetPolarity(Globals.NEGATIVE_TWEET);
+			else if (item.toString().equals(Globals.NEUTRAL_TWEET_STR))
+				tweet.setTweetPolarity(Globals.NEUTRAL_TWEET);
+			else if (item.toString().equals(Globals.POSITIVE_TWEET_STR))
+				tweet.setTweetPolarity(Globals.POSITIVE_TWEET);
 			else
-				tweet.setTweetPolarity(Constants.NON_ANNOTATED_TWEET);
+				tweet.setTweetPolarity(Globals.NON_ANNOTATED_TWEET);
 
 		}
 	}
@@ -410,7 +410,8 @@ public class Main {
 		
 		for(int i = 0; i < this.pjeTwitter.getCountResult() && i < status.size(); i++) {
 			TweetInfo tweet = new TweetInfo(status.get(i), this.txtSearch.getText());
-			this.tweetInfoList.add(tweet);
+			if(!tweet.getTweetText().startsWith("RT"))
+				this.tweetInfoList.add(tweet);
 		}
 		
 		List<TweetInfo> tweetInfoIntern = new ArrayList<TweetInfo>(this.tweetInfoList);
@@ -443,7 +444,7 @@ public class Main {
 		for (Entry<Long, TweetInfo> entry : set)
 		{
 			TweetInfo tweet = entry.getValue();
-			if (tweet.getTweetPolarity() != Constants.NON_ANNOTATED_TWEET)
+			if (tweet.getTweetPolarity() != Globals.NON_ANNOTATED_TWEET)
 			{
 				csvReference.write(tweet, true);
 			}
@@ -477,21 +478,21 @@ public class Main {
 			
 			System.out.println("tweet.getTweetPolarity(): " + tweet.getTweetPolarity());
 			
-			if (tweet.getTweetPolarity() == Constants.POSITIVE_TWEET)
+			if (tweet.getTweetPolarity() == Globals.POSITIVE_TWEET)
 			{
-				this.comboBoxTweetPolarity.setSelectedItem(Constants.POSITIVE_TWEET_STR);
+				this.comboBoxTweetPolarity.setSelectedItem(Globals.POSITIVE_TWEET_STR);
 			}
-			else if (tweet.getTweetPolarity() == Constants.NEGATIVE_TWEET)
+			else if (tweet.getTweetPolarity() == Globals.NEGATIVE_TWEET)
 			{
-				this.comboBoxTweetPolarity.setSelectedItem(Constants.NEGATIVE_TWEET_STR);
+				this.comboBoxTweetPolarity.setSelectedItem(Globals.NEGATIVE_TWEET_STR);
 			}
-			else if (tweet.getTweetPolarity() == Constants.NEUTRAL_TWEET)
+			else if (tweet.getTweetPolarity() == Globals.NEUTRAL_TWEET)
 			{
-				this.comboBoxTweetPolarity.setSelectedItem(Constants.NEUTRAL_TWEET_STR);
+				this.comboBoxTweetPolarity.setSelectedItem(Globals.NEUTRAL_TWEET_STR);
 			}
 			else
 			{
-				this.comboBoxTweetPolarity.setSelectedItem(Constants.NON_ANNOTATED_TWEET_STR);
+				this.comboBoxTweetPolarity.setSelectedItem(Globals.NON_ANNOTATED_TWEET_STR);
 			}
 	    }
 	}

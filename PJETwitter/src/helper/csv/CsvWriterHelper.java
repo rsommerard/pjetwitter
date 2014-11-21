@@ -1,6 +1,6 @@
 package helper.csv;
 
-import helper.Constants;
+import helper.Globals;
 import helper.Utils;
 import java.io.File;
 import java.io.FileWriter;
@@ -29,7 +29,7 @@ public class CsvWriterHelper extends AbstractCsvHelper
 		}
 
 		// use FileWriter constructor that specifies open for appending
-		CsvWriter csvOutput = new CsvWriter(new FileWriter(outputFile, true), Constants.CSV_DELIMITER);
+		CsvWriter csvOutput = new CsvWriter(new FileWriter(outputFile, true), Globals.CSV_DELIMITER);
 
 		// if the file didn't already exist then we need to write out the
 		// header line

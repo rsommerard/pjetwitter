@@ -52,10 +52,10 @@ public class Utils
 				// On peut ainsi modifier sa polarité sans le modifier par référence dans api
 				// (newTweets va être écrit dans csvBase, toutes les polaritées doivent être à NON_ANNOTATED)
 				TweetInfo clone = (TweetInfo) apiTweet.clone();
-				clone.setTweetPolarity(Constants.NON_ANNOTATED_TWEET);
+				clone.setTweetPolarity(Globals.NON_ANNOTATED_TWEET);
 				newTweets.add(clone);
 			}
-			
+
 		}
 		else
 		{
@@ -71,7 +71,7 @@ public class Utils
 					if (apiTweet.compareTo(newTweet) != 0)
 					{
 						TweetInfo clone = (TweetInfo) apiTweet.clone();
-						clone.setTweetPolarity(Constants.NON_ANNOTATED_TWEET);
+						clone.setTweetPolarity(Globals.NON_ANNOTATED_TWEET);
 						newTweets.add(clone);
 					}
 				}
@@ -93,24 +93,26 @@ public class Utils
 
 	public static Date stringToDate(String sDate) throws Exception
 	{
-		SimpleDateFormat sdf = new SimpleDateFormat(Constants.DATE_FORMAT);
+		SimpleDateFormat sdf = new SimpleDateFormat(Globals.DATE_FORMAT);
 		return sdf.parse(sDate);
 	}
 
 	public static String DateToString(Date sDate)
 	{
-		SimpleDateFormat sdf = new SimpleDateFormat(Constants.DATE_FORMAT);
+		SimpleDateFormat sdf = new SimpleDateFormat(Globals.DATE_FORMAT);
 		return sdf.format(sDate);
 	}
 
 	public static String cleanTweet(String tweetText)
 	{
-		tweetText = regexRemoveMatched(tweetText, Constants.TWITTER_USERNAME_REGEX);
-		tweetText = regexRemoveMatched(tweetText, Constants.TWITTER_HASH_REGEX);
-		tweetText = regexRemoveMatched(tweetText, Constants.TWITTER_EMOTICON_REGEX);
-		tweetText = regexRemoveMatched(tweetText, Constants.TWITTER_URL_REGEX);
+		tweetText = regexRemoveMatched(tweetText, Globals.TWITTER_USERNAME_REGEX);
+		tweetText = regexRemoveMatched(tweetText, Globals.TWITTER_HASH_REGEX);
+		tweetText = regexRemoveMatched(tweetText, Globals.TWITTER_EMOTICON_REGEX);
+		tweetText = regexRemoveMatched(tweetText, Globals.TWITTER_URL_REGEX);
 
 		tweetText = tweetText.replace(";", "");
+		tweetText = tweetText.replace("@", "");
+		tweetText = tweetText.trim();
 
 		return tweetText;
 	}
@@ -119,12 +121,27 @@ public class Utils
 	{
 		Pattern pattern = Pattern.compile(regex);
 		Matcher matcher = pattern.matcher(text);
-		if (matcher.find())
+		
+		while (matcher.find())
 		{
 			text = matcher.replaceAll("");
 		}
 
 		return text;
+	}
+	
+	public static String polarityToString(int polarity)
+	{
+		if (polarity == Globals.NEGATIVE_TWEET)
+			return "NegativeTweet";
+		if (polarity == Globals.POSITIVE_TWEET)
+			return "PositiveTweet";
+		if (polarity == Globals.NEUTRAL_TWEET)
+			return "NeutralTweet";
+		if (polarity == Globals.NON_ANNOTATED_TWEET)
+			return "NonAnnotatedTweet";
+		else
+			return "<UnknownPolarity>";
 	}
 
 }

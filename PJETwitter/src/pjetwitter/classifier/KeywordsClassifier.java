@@ -1,6 +1,6 @@
 package pjetwitter.classifier;
 
-import helper.Constants;
+import helper.Globals;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -17,8 +17,8 @@ public class KeywordsClassifier {
     	
     	try
     	{
-    		this.loadWords(Constants.POSITIVE_FILE_PATH);
-        	this.loadWords(Constants.NEGATIVE_FILE_PATH);
+    		this.loadWords(Globals.POSITIVE_FILE_PATH);
+        	this.loadWords(Globals.NEGATIVE_FILE_PATH);
     	}
     	catch(Exception e) { }
     }
@@ -60,14 +60,14 @@ public class KeywordsClassifier {
     	}
     	
     	if(count < 0) {
-    		return Constants.NEGATIVE_TWEET;
+    		return Globals.NEGATIVE_TWEET;
     	}
     	
     	if(count > 0) {
-    		return Constants.POSITIVE_TWEET;
+    		return Globals.POSITIVE_TWEET;
     	}
     	
-    	return Constants.NEUTRAL_TWEET;
+    	return Globals.NEUTRAL_TWEET;
     }
     
     public static void main(String[] args) {

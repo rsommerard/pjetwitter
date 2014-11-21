@@ -1,6 +1,6 @@
 package helper.csv;
 
-import helper.Constants;
+import helper.Globals;
 
 public class CsvSingletons
 {
@@ -13,8 +13,8 @@ public class CsvSingletons
 
 	private CsvSingletons()
 	{
-		baseCsv = new CsvHelper(Constants.CSV_BASE_LOCATION);
-		referenceCsv = new CsvHelper(Constants.CSV_REFERENCE_LOCATION);
+		baseCsv = new CsvHelper(Globals.CSV_BASE_LOCATION);
+		referenceCsv = new CsvHelper(Globals.CSV_REFERENCE_LOCATION);
 	}
 
 

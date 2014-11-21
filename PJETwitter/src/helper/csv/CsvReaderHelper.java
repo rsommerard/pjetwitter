@@ -1,6 +1,6 @@
 package helper.csv;
 
-import helper.Constants;
+import helper.Globals;
 import helper.Utils;
 import java.io.File;
 import java.util.Date;
@@ -26,7 +26,7 @@ public class CsvReaderHelper extends AbstractCsvHelper
 
 		try
 		{
-			CsvReader products = new CsvReader(csv_location, Constants.CSV_DELIMITER);
+			CsvReader products = new CsvReader(csv_location, Globals.CSV_DELIMITER);
 
 			products.readHeaders();
 

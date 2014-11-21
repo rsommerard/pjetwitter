@@ -1,6 +1,6 @@
 package pjetwitter;
 
-import helper.Constants;
+import helper.Globals;
 
 import java.util.Date;
 
@@ -33,7 +33,7 @@ public class TweetInfo implements Comparable<TweetInfo>, Cloneable
 
 	public TweetInfo(Status status, String usedRequest)
 	{
-		this(status.getId(), status.getUser().getScreenName(), status.getText(), status.getCreatedAt(), usedRequest, Constants.NON_ANNOTATED_TWEET);
+		this(status.getId(), status.getUser().getScreenName(), status.getText(), status.getCreatedAt(), usedRequest, Globals.NON_ANNOTATED_TWEET);
 	}
 
 	public long getTweetID()

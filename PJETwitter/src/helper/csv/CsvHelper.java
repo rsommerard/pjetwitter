@@ -1,6 +1,6 @@
 package helper.csv;
 
-import helper.Constants;
+import helper.Globals;
 import helper.Utils;
 
 import java.io.File;

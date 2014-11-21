@@ -1,13 +1,15 @@
 package helper;
 
-public class Constants
+public class Globals
 {
 	public final static String DATE_FORMAT = "dd-MM-yy hh:mm:ss";
 
 	public static final String TWITTER_URL_REGEX = "https?://t.co/\\w+";
 	public static final String TWITTER_USERNAME_REGEX = "(^|[^@\\w])@(\\w{1,15})\\b";
-	public static final String TWITTER_HASH_REGEX = "(?:(?<=\\s)|^)#(\\w*[A-Za-z_]+\\w*)";
+	public static final String TWITTER_HASH_REGEX = "(?:(?<=\\s)|\'|^)#(\\w*[A-Za-z_#]+\\w*)";
 	public static final String TWITTER_EMOTICON_REGEX = "((?::|;|=)(?:-)?(?:\\)|D|P|d|p))";
+	public static final String US_ASCII_ONLY_REGEX = "[^\\p{ASCII}]";
+	public static final String US_ALPHANUM_ONLY_REGEX = "[^\\P{Alnum}]";
 
 
 	public final static String CSV_BASE_LOCATION = "data/base.csv";
@@ -34,4 +36,6 @@ public class Constants
 	public final static String LANG_ALL = "All";
 	public final static String LANG_EN = "English";
 	public final static String LANG_FR = "French";
+	
+	public final static int KNN_NB_PROCHES_VOISINS = 10;
 }
