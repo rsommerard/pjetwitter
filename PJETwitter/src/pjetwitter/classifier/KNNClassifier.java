@@ -1,23 +1,25 @@
 package pjetwitter.classifier;
 
 import helper.Globals;
-import helper.Utils;
 
 import java.util.*;
 
+import helper.Utils;
 import pjetwitter.TweetInfo;
 
 public class KNNClassifier
 {
 	private int nbVoisin = 5;
-	
-	private ArrayList<TweetInfo> listTweets;
-	
-	public KNNClassifier() {
-		this.listTweets = new ArrayList<TweetInfo>(helper.csv.CsvSingletons.getInstance().referenceCsv.readAll());
+
+	private List<TweetInfo> listTweets;
+
+	public KNNClassifier(List<TweetInfo> references)
+	{
+		this.listTweets = references;
 	}
-	
-	public int classify(String tweet) {
+
+	public int classify(String tweet)
+	{
 		ArrayList<Voisin> distances = calculateDistances(listTweets, tweet);
 		ArrayList<Voisin> voisins = new ArrayList<Voisin>();
 
@@ -27,42 +29,53 @@ public class KNNClassifier
 			voisins.add(distances.get(index));
 			distances.remove(index);
 		}
-		
+
+		/*
+		 * int i = 0; for(Voisin voisin : distances) { if(voisin.getDistance() < 0.2) { return voisins.get(i).getInstance().getTweetPolarity(); } i++;
+		 * }
+		 */
+
 		int classification = determineMajority(voisins);
-		
-		System.out.println("Recherche des " + this.nbVoisin + " plus proches voisins de:");
-		System.out.println("\"" + tweet + "\"");
+
+		// System.out.println("Recherche des " + this.nbVoisin + " plus proches voisins de:");
+		// System.out.println("\"" + tweet + "\"");
+
 		this.printNeighbors(voisins);
-		System.out.println("\nPolarité pour le tweet: " + Utils.polarityToString(classification));
-		
+
+		// System.out.println("\nPolarité pour le tweet: " + Utils.polarityToString(classification));
+
 		return classification;
 	}
 
-	private int minDistanceVoisin(ArrayList<Voisin> distances) {
+	private int minDistanceVoisin(ArrayList<Voisin> distances)
+	{
 		int indexMin = 0;
 		double distanceMin = distances.get(0).getDistance();
-		
-		for(int i = 1; i < distances.size(); i++) {
-			if(distances.get(i).getDistance() < distanceMin) {
+
+		for (int i = 1; i < distances.size(); i++)
+		{
+			if (distances.get(i).getDistance() < distanceMin)
+			{
 				indexMin = i;
 				distanceMin = distances.get(i).getDistance();
 			}
 		}
-		
+
 		return indexMin;
 	}
 
 	private void printNeighbors(ArrayList<Voisin> voisins)
 	{
-		int i = 0;
-		for (Voisin voisin : voisins)
-		{
-			TweetInfo tweet = voisin.getInstance();
-
-			System.out.println("\nVoisin " + (i + 1) + ", ID=" + tweet.getTweetID() + " (" + tweet.getTweetPublisher() + ")");
-			System.out.println("  distance: " + voisin.getDistance());
-			i++;
-		}
+		// int i = 0;
+		// for (Voisin voisin : voisins)
+		// {
+		// TweetInfo tweet = voisin.getInstance();
+		//
+		// System.out.println("\nVoisin " + (i + 1) + ", ID=" + tweet.getTweetID() + " (" + tweet.getTweetPublisher() + ")");
+		// System.out.println("  distance: " + voisin.getDistance());
+		//
+		// i++;
+		// }
 	}
 
 	private int determineMajority(ArrayList<Voisin> voisins)
@@ -86,24 +99,10 @@ public class KNNClassifier
 			}
 		}
 
-
-		if (pos > neg)
-		{
-			if (neutr > pos)
-				return Globals.NEUTRAL_TWEET;
-			else
-				return Globals.POSITIVE_TWEET;
-		}
-		else
-		{
-			if (neutr > neg)
-				return Globals.NEUTRAL_TWEET;
-			else
-				return Globals.NEGATIVE_TWEET;
-		}
+		return Utils.probabilitiesToTweetPolarity(neg, neutr, pos, false);
 	}
 
-	private ArrayList<Voisin> calculateDistances(ArrayList<TweetInfo> instances, String tweet)
+	private ArrayList<Voisin> calculateDistances(List<TweetInfo> instances, String tweet)
 	{
 		ArrayList<Voisin> distances = new ArrayList<Voisin>();
 		double distance = 0;
@@ -136,8 +135,8 @@ public class KNNClassifier
 
 	private double distance(String tweet1, String tweet2)
 	{
-		String[] tweet1Splited = tweet1.split("\\s");
-		String[] tweet2Splited = tweet2.split("\\s");
+		String[] tweet1Splited = tweet1.split(" ");
+		String[] tweet2Splited = tweet2.split(" ");
 
 		List<String> tweet2List = new ArrayList<String>();
 		for (String str : tweet2Splited)

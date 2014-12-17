@@ -35,6 +35,10 @@ public class TweetInfo implements Comparable<TweetInfo>, Cloneable
 	{
 		this(status.getId(), status.getUser().getScreenName(), status.getText(), status.getCreatedAt(), usedRequest, Globals.NON_ANNOTATED_TWEET);
 	}
+	
+	public void setTweetText(String text) {
+		this.tweetText = text;
+	}
 
 	public long getTweetID()
 	{

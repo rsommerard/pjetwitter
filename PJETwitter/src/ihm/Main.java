@@ -45,6 +45,16 @@ import javax.swing.JScrollPane;
 
 import pjetwitter.PJETwitter;
 import pjetwitter.TweetInfo;
+import pjetwitter.classifier.BayesienneBiFrequenceClassifier;
+import pjetwitter.classifier.BayesienneBiPresenceClassifier;
+import pjetwitter.classifier.BayesienneUniBiFrequenceClassifier;
+import pjetwitter.classifier.BayesienneUniBiPresenceClassifier;
+import pjetwitter.classifier.BayesienneUniFrequenceClassifier;
+import pjetwitter.classifier.BayesienneUniPresenceClassifier;
+import pjetwitter.classifier.KNNClassifier;
+import pjetwitter.classifier.KeywordsClassifier;
+import stats.CrossValidationStats;
+import stats.charts.RatioSearchChart;
 import twitter4j.QueryResult;
 import twitter4j.Status;
 
@@ -82,19 +92,32 @@ public class Main {
 	
 	private JComboBox comboBoxTweetPolarity;
 	
-	private JMenuBar lblRateLimit;
+	private JMenuBar menuBar;
 	
 	private JMenu mnPjetwitter;
 	private JMenu mnRequest;
 	private JMenu mnProxy;
+	private JMenu mnClassifier;
 	
 	private JMenuItem mntmExit;
 	private JMenuItem mntmRequestProperties;
 	private JMenuItem mntmProxyProperties;
+	private JMenuItem mntmClassifierShowStats;
 	
 	private JCheckBoxMenuItem chckbxmntmUseProxy;
+	private JCheckBoxMenuItem chckbxmntmKeywordsClassifier;
+	private JCheckBoxMenuItem chckbxmntmKNNClassifier;
+	private JCheckBoxMenuItem chckbxmntmBayesienneUniPresenceClassifier;
+	private JCheckBoxMenuItem chckbxmntmBayesienneBiPresenceClassifier;
+	private JCheckBoxMenuItem chckbxmntmBayesienneUniBiPresenceClassifier;
+	private JCheckBoxMenuItem chckbxmntmBayesienneUniFrequenceClassifier;
+	private JCheckBoxMenuItem chckbxmntmBayesienneBiFrequenceClassifier;
+	private JCheckBoxMenuItem chckbxmntmBayesienneUniBiFrequenceClassifier;
+	private JCheckBoxMenuItem chckbxmntmEnableSave;
 	
 	private JSeparator separatorProxy;
+	private JSeparator separatorClassifier;
+	private JSeparator separatorBisClassifier;
 	
 	private JPanel panelSearchSave;
 	private JPanel panelSearch;
@@ -172,11 +195,11 @@ public class Main {
 		this.frame.setBounds(100, 100, 650, 500);
 		this.frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		
-		this.lblRateLimit = new JMenuBar();
-		this.frame.setJMenuBar(this.lblRateLimit);
+		this.menuBar = new JMenuBar();
+		this.frame.setJMenuBar(this.menuBar);
 		
 		this.mnPjetwitter = new JMenu("PJETwitter");
-		this.lblRateLimit.add(this.mnPjetwitter);
+		this.menuBar.add(this.mnPjetwitter);
 		
 		this.mntmExit = new JMenuItem("Exit");
 		this.mntmExit.addActionListener(new ActionListener() {
@@ -187,7 +210,97 @@ public class Main {
 		this.mnPjetwitter.add(this.mntmExit);
 		
 		this.mnRequest = new JMenu("Request");
-		this.lblRateLimit.add(this.mnRequest);
+		this.menuBar.add(this.mnRequest);
+		
+		this.mnClassifier = new JMenu("Classifier");
+		this.menuBar.add(this.mnClassifier);
+		
+		this.chckbxmntmKeywordsClassifier = new JCheckBoxMenuItem("Keywords");
+		this.mnClassifier.add(this.chckbxmntmKeywordsClassifier);
+		this.chckbxmntmKeywordsClassifier.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				actionPerformedChckbxmntmKeywordsClassifier(e);
+			}
+		});
+		
+		this.chckbxmntmKNNClassifier = new JCheckBoxMenuItem("KNN");
+		this.mnClassifier.add(this.chckbxmntmKNNClassifier);
+		this.chckbxmntmKNNClassifier.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				actionPerformedChckbxmntmKNNClassifier(e);
+			}
+		});
+		
+		this.chckbxmntmBayesienneUniPresenceClassifier = new JCheckBoxMenuItem("Bayesienne Uni Presence");
+		this.mnClassifier.add(this.chckbxmntmBayesienneUniPresenceClassifier);
+		this.chckbxmntmBayesienneUniPresenceClassifier.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				actionPerformedChckbxmntmBayesienneUniPresenceClassifier(e);
+			}
+		});
+		
+		this.chckbxmntmBayesienneUniFrequenceClassifier = new JCheckBoxMenuItem("Bayesienne Uni Frequence");
+		this.mnClassifier.add(this.chckbxmntmBayesienneUniFrequenceClassifier);
+		this.chckbxmntmBayesienneUniFrequenceClassifier.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				actionPerformedChckbxmntmBayesienneUniFrequenceClassifier(e);
+			}
+		});
+		
+		this.chckbxmntmBayesienneBiPresenceClassifier = new JCheckBoxMenuItem("Bayesienne Bi Presence");
+		this.mnClassifier.add(this.chckbxmntmBayesienneBiPresenceClassifier);
+		this.chckbxmntmBayesienneBiPresenceClassifier.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				actionPerformedChckbxmntmBayesienneBiPresenceClassifier(e);
+			}
+		});
+		
+		this.chckbxmntmBayesienneBiFrequenceClassifier = new JCheckBoxMenuItem("Bayesienne Bi Frequence");
+		this.mnClassifier.add(this.chckbxmntmBayesienneBiFrequenceClassifier);
+		this.chckbxmntmBayesienneBiFrequenceClassifier.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				actionPerformedChckbxmntmBayesienneBiFrequenceClassifier(e);
+			}
+		});
+		
+		this.chckbxmntmBayesienneUniBiPresenceClassifier = new JCheckBoxMenuItem("Bayesienne Uni+Bi Presence");
+		this.mnClassifier.add(this.chckbxmntmBayesienneUniBiPresenceClassifier);
+		this.chckbxmntmBayesienneUniBiPresenceClassifier.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				actionPerformedChckbxmntmBayesienneUniBiPresenceClassifier(e);
+			}
+		});
+		
+		this.chckbxmntmBayesienneUniBiFrequenceClassifier = new JCheckBoxMenuItem("Bayesienne Uni+Bi Frequence");
+		this.mnClassifier.add(this.chckbxmntmBayesienneUniBiFrequenceClassifier);
+		this.chckbxmntmBayesienneUniBiFrequenceClassifier.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				actionPerformedChckbxmntmBayesienneUniBiFrequenceClassifier(e);
+			}
+		});
+		
+		this.separatorClassifier = new JSeparator();
+		this.mnClassifier.add(this.separatorClassifier);
+		
+		this.chckbxmntmEnableSave = new JCheckBoxMenuItem("Enable save");
+		this.chckbxmntmEnableSave.setState(false);
+		this.mnClassifier.add(this.chckbxmntmEnableSave);
+		this.chckbxmntmEnableSave.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				actionPerformedChckbxmntmEnableSave(e);
+			}
+		});
+		
+		this.separatorBisClassifier = new JSeparator();
+		this.mnClassifier.add(this.separatorBisClassifier);
+		
+		this.mntmClassifierShowStats = new JMenuItem("Show Stats");
+		this.mnClassifier.add(this.mntmClassifierShowStats);
+		this.mntmClassifierShowStats.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				actionPerformedMntmClassifierShowStats(e);
+			}
+		});
 		
 		this.mntmRequestProperties = new JMenuItem("Properties");
 		this.mntmRequestProperties.addActionListener(new ActionListener() {
@@ -198,9 +311,11 @@ public class Main {
 		this.mnRequest.add(this.mntmRequestProperties);
 		
 		this.mnProxy = new JMenu("Proxy");
-		this.lblRateLimit.add(this.mnProxy);
+		this.menuBar.add(this.mnProxy);
 		
 		this.chckbxmntmUseProxy = new JCheckBoxMenuItem("Use Proxy");
+		this.chckbxmntmUseProxy.setState(!this.chckbxmntmUseProxy.getState());
+		this.pjeTwitter.enableProxy();
 		this.chckbxmntmUseProxy.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				actionPerformedChckbxmntmUseProxy(e);
@@ -245,8 +360,8 @@ public class Main {
 		
 		this.panelSave = new JPanel();
 		this.panelSearchSave.add(this.panelSave, BorderLayout.EAST);
-		
 		this.btnSave = new JButton("Save");
+		this.btnSave.setEnabled(false);
 		this.panelSave.add(this.btnSave);
 		this.btnSave.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -344,7 +459,6 @@ public class Main {
 			}
 			
 			Object item = event.getItem();
-			System.out.println("Combobox selected value: " + item.toString());
 
 			TweetInfo tweet = this.tweets.get(listTweets.getSelectedValue());
 
@@ -360,6 +474,7 @@ public class Main {
 
 		}
 	}
+	
 	private void actionPerformedMntmExit(ActionEvent e) {
 		System.exit(0);
 	}
@@ -414,11 +529,119 @@ public class Main {
 				this.tweetInfoList.add(tweet);
 		}
 		
-		List<TweetInfo> tweetInfoIntern = new ArrayList<TweetInfo>(this.tweetInfoList);
-
-		Utils.removeAlreadyAnnotatedTweetsFrom(tweetInfoIntern);
+		this.panelTweets.setBorder(new TitledBorder(null, "Tweets " + this.tweetInfoList.size(), TitledBorder.LEADING, TitledBorder.TOP, null, null));
 		
+		List<TweetInfo> tweetInfoIntern = new ArrayList<TweetInfo>();
+		for(TweetInfo tweet : this.tweetInfoList) {
+			tweetInfoIntern.add((TweetInfo)tweet.clone());
+		}
+		
+		if(this.chckbxmntmKeywordsClassifier.getState()) {
+			KeywordsClassifier classifier = new KeywordsClassifier();
+
+			for(TweetInfo tweet : tweetInfoIntern) {
+				tweet.setTweetText(Utils.cleanTweet(tweet.getTweetText()));
+				tweet.setTweetPolarity(classifier.classify(tweet.getTweetText()));
+			}
+			
+			new RatioSearchChart(tweetInfoIntern, this.txtSearch.getText());
+		}
+		else if(this.chckbxmntmKNNClassifier.getState()) {
+			CsvHelper csvReference =  CsvSingletons.getInstance().referenceCsv;
+			
+			KNNClassifier classifier = new KNNClassifier(csvReference.readAll());
+
+			for(TweetInfo tweet : tweetInfoIntern) {
+				tweet.setTweetText(Utils.cleanTweet(tweet.getTweetText()));
+				tweet.setTweetPolarity(classifier.classify(tweet.getTweetText()));
+			}
+			
+			new RatioSearchChart(tweetInfoIntern, this.txtSearch.getText());
+		}
+		else if(this.chckbxmntmBayesienneUniPresenceClassifier.getState()) {
+			CsvHelper csvReference =  CsvSingletons.getInstance().referenceCsv;
+			
+			BayesienneUniPresenceClassifier classifier = new BayesienneUniPresenceClassifier(csvReference.readAll());
+
+			for(TweetInfo tweet : tweetInfoIntern) {
+				tweet.setTweetText(Utils.cleanTweet(tweet.getTweetText()));
+				tweet.setTweetPolarity(classifier.classify(tweet.getTweetText()));
+			}
+			
+			new RatioSearchChart(tweetInfoIntern, this.txtSearch.getText());
+		}
+		else if(this.chckbxmntmBayesienneUniFrequenceClassifier.getState()) {
+			CsvHelper csvReference =  CsvSingletons.getInstance().referenceCsv;
+			
+			BayesienneUniFrequenceClassifier classifier = new BayesienneUniFrequenceClassifier(csvReference.readAll());
+
+			for(TweetInfo tweet : tweetInfoIntern) {
+				tweet.setTweetText(Utils.cleanTweet(tweet.getTweetText()));
+				tweet.setTweetPolarity(classifier.classify(tweet.getTweetText()));
+			}
+			
+			new RatioSearchChart(tweetInfoIntern, this.txtSearch.getText());
+		}
+		else if(this.chckbxmntmBayesienneBiPresenceClassifier.getState()) {
+			CsvHelper csvReference =  CsvSingletons.getInstance().referenceCsv;
+			
+			BayesienneBiPresenceClassifier classifier = new BayesienneBiPresenceClassifier(csvReference.readAll());
+
+			for(TweetInfo tweet : tweetInfoIntern) {
+				tweet.setTweetText(Utils.cleanTweet(tweet.getTweetText()));
+				tweet.setTweetPolarity(classifier.classify(tweet.getTweetText()));
+			}
+			
+			new RatioSearchChart(tweetInfoIntern, this.txtSearch.getText());
+		}
+		else if(this.chckbxmntmBayesienneBiFrequenceClassifier.getState()) {
+			CsvHelper csvReference =  CsvSingletons.getInstance().referenceCsv;
+			
+			BayesienneBiFrequenceClassifier classifier = new BayesienneBiFrequenceClassifier(csvReference.readAll());
+
+			for(TweetInfo tweet : tweetInfoIntern) {
+				tweet.setTweetText(Utils.cleanTweet(tweet.getTweetText()));
+				tweet.setTweetPolarity(classifier.classify(tweet.getTweetText()));
+			}
+			
+			new RatioSearchChart(tweetInfoIntern, this.txtSearch.getText());
+		}
+		else if(this.chckbxmntmBayesienneUniBiPresenceClassifier.getState()) {
+			CsvHelper csvReference =  CsvSingletons.getInstance().referenceCsv;
+			
+			BayesienneUniBiPresenceClassifier classifier = new BayesienneUniBiPresenceClassifier(csvReference.readAll());
+
+			for(TweetInfo tweet : tweetInfoIntern) {
+				tweet.setTweetText(Utils.cleanTweet(tweet.getTweetText()));
+				tweet.setTweetPolarity(classifier.classify(tweet.getTweetText()));
+			}
+			
+			new RatioSearchChart(tweetInfoIntern, this.txtSearch.getText());
+		}
+		else if(this.chckbxmntmBayesienneUniBiFrequenceClassifier.getState()) {
+			CsvHelper csvReference =  CsvSingletons.getInstance().referenceCsv;
+			
+			BayesienneUniBiFrequenceClassifier classifier = new BayesienneUniBiFrequenceClassifier(csvReference.readAll());
+
+			for(TweetInfo tweet : tweetInfoIntern) {
+				tweet.setTweetText(Utils.cleanTweet(tweet.getTweetText()));
+				tweet.setTweetPolarity(classifier.classify(tweet.getTweetText()));
+			}
+			
+			new RatioSearchChart(tweetInfoIntern, this.txtSearch.getText());
+		}
+		else {
+			Utils.removeAlreadyAnnotatedTweetsFrom(tweetInfoIntern);
+		}
+		
+		this.btnSave.setEnabled(this.chckbxmntmEnableSave.getState());
+		
+		int i = 0;
 		for(TweetInfo tweet : tweetInfoIntern) {
+			this.tweetInfoList.get(i++).setTweetPolarity(tweet.getTweetPolarity());
+		}
+		
+		for(TweetInfo tweet : this.tweetInfoList) {
 			this.tweets.put(tweet.getTweetID(), tweet);
 			model.addElement(tweet.getTweetID());
 		}
@@ -434,6 +657,7 @@ public class Main {
 	{
 		if (this.tweets.size() == 0 || listTweets.getModel().getSize() == 0 || this.tweets.size() != listTweets.getModel().getSize())
 		{
+			JOptionPane.showMessageDialog(this.frame, "Cannot save.", "Error", JOptionPane.ERROR_MESSAGE);
 			System.out.println("[ERR] Cannot save tweets");
 			return;
 		}
@@ -449,14 +673,7 @@ public class Main {
 				csvReference.write(tweet, true);
 			}
 		}
-		
-		// Tout sauver en base
-		CsvHelper csvBase =  CsvSingletons.getInstance().baseCsv;
-		List<TweetInfo> oldBase = csvBase.readAll();
-		List<TweetInfo> api = this.tweetInfoList;		
-		Utils.createNewBaseFrom(oldBase, api);
 
-		
 		JOptionPane.showMessageDialog(this.frame, "Save success.", "Success", JOptionPane.INFORMATION_MESSAGE);
 		
 	}
@@ -476,8 +693,6 @@ public class Main {
 			this.lblTweetDateValue.setText(tweet.getTweetDate().toString());
 			this.textAreaTweetMessage.setText(tweet.getTweetText());
 			
-			System.out.println("tweet.getTweetPolarity(): " + tweet.getTweetPolarity());
-			
 			if (tweet.getTweetPolarity() == Globals.POSITIVE_TWEET)
 			{
 				this.comboBoxTweetPolarity.setSelectedItem(Globals.POSITIVE_TWEET_STR);
@@ -495,5 +710,93 @@ public class Main {
 				this.comboBoxTweetPolarity.setSelectedItem(Globals.NON_ANNOTATED_TWEET_STR);
 			}
 	    }
+	}
+	
+	private void actionPerformedChckbxmntmKeywordsClassifier(ActionEvent e) {
+		this.chckbxmntmKNNClassifier.setSelected(false);
+		this.chckbxmntmBayesienneUniPresenceClassifier.setSelected(false);
+		this.chckbxmntmBayesienneUniFrequenceClassifier.setSelected(false);
+		this.chckbxmntmBayesienneBiPresenceClassifier.setSelected(false);
+		this.chckbxmntmBayesienneBiFrequenceClassifier.setSelected(false);
+		this.chckbxmntmBayesienneUniBiPresenceClassifier.setSelected(false);
+		this.chckbxmntmBayesienneUniBiFrequenceClassifier.setSelected(false);
+	}
+	
+	private void actionPerformedChckbxmntmKNNClassifier(ActionEvent e) {
+		this.chckbxmntmKeywordsClassifier.setSelected(false);
+		this.chckbxmntmBayesienneUniPresenceClassifier.setSelected(false);
+		this.chckbxmntmBayesienneUniFrequenceClassifier.setSelected(false);
+		this.chckbxmntmBayesienneBiPresenceClassifier.setSelected(false);
+		this.chckbxmntmBayesienneBiFrequenceClassifier.setSelected(false);
+		this.chckbxmntmBayesienneUniBiPresenceClassifier.setSelected(false);
+		this.chckbxmntmBayesienneUniBiFrequenceClassifier.setSelected(false);
+	}
+	
+	private void actionPerformedChckbxmntmBayesienneUniPresenceClassifier(ActionEvent e) {
+		this.chckbxmntmKeywordsClassifier.setSelected(false);
+		this.chckbxmntmKNNClassifier.setSelected(false);
+		this.chckbxmntmBayesienneUniFrequenceClassifier.setSelected(false);
+		this.chckbxmntmBayesienneBiPresenceClassifier.setSelected(false);
+		this.chckbxmntmBayesienneBiFrequenceClassifier.setSelected(false);
+		this.chckbxmntmBayesienneUniBiPresenceClassifier.setSelected(false);
+		this.chckbxmntmBayesienneUniBiFrequenceClassifier.setSelected(false);
+	}
+	
+	private void actionPerformedChckbxmntmBayesienneUniFrequenceClassifier(ActionEvent e) {
+		this.chckbxmntmKeywordsClassifier.setSelected(false);
+		this.chckbxmntmKNNClassifier.setSelected(false);
+		this.chckbxmntmBayesienneUniPresenceClassifier.setSelected(false);
+		this.chckbxmntmBayesienneBiPresenceClassifier.setSelected(false);
+		this.chckbxmntmBayesienneBiFrequenceClassifier.setSelected(false);
+		this.chckbxmntmBayesienneUniBiPresenceClassifier.setSelected(false);
+		this.chckbxmntmBayesienneUniBiFrequenceClassifier.setSelected(false);
+	}
+	
+	private void actionPerformedChckbxmntmBayesienneBiPresenceClassifier(ActionEvent e) {
+		this.chckbxmntmKeywordsClassifier.setSelected(false);
+		this.chckbxmntmKNNClassifier.setSelected(false);
+		this.chckbxmntmBayesienneUniPresenceClassifier.setSelected(false);
+		this.chckbxmntmBayesienneUniFrequenceClassifier.setSelected(false);
+		this.chckbxmntmBayesienneBiFrequenceClassifier.setSelected(false);
+		this.chckbxmntmBayesienneUniBiPresenceClassifier.setSelected(false);
+		this.chckbxmntmBayesienneUniBiFrequenceClassifier.setSelected(false);
+	}
+	
+	private void actionPerformedChckbxmntmBayesienneBiFrequenceClassifier(ActionEvent e) {
+		this.chckbxmntmKeywordsClassifier.setSelected(false);
+		this.chckbxmntmKNNClassifier.setSelected(false);
+		this.chckbxmntmBayesienneUniPresenceClassifier.setSelected(false);
+		this.chckbxmntmBayesienneUniFrequenceClassifier.setSelected(false);
+		this.chckbxmntmBayesienneBiPresenceClassifier.setSelected(false);
+		this.chckbxmntmBayesienneUniBiPresenceClassifier.setSelected(false);
+		this.chckbxmntmBayesienneUniBiFrequenceClassifier.setSelected(false);
+	}
+	
+	private void actionPerformedChckbxmntmBayesienneUniBiPresenceClassifier(ActionEvent e) {
+		this.chckbxmntmKeywordsClassifier.setSelected(false);
+		this.chckbxmntmKNNClassifier.setSelected(false);
+		this.chckbxmntmBayesienneUniPresenceClassifier.setSelected(false);
+		this.chckbxmntmBayesienneUniFrequenceClassifier.setSelected(false);
+		this.chckbxmntmBayesienneBiPresenceClassifier.setSelected(false);
+		this.chckbxmntmBayesienneBiFrequenceClassifier.setSelected(false);
+		this.chckbxmntmBayesienneUniBiFrequenceClassifier.setSelected(false);
+	}
+	
+	private void actionPerformedChckbxmntmBayesienneUniBiFrequenceClassifier(ActionEvent e) {
+		this.chckbxmntmKeywordsClassifier.setSelected(false);
+		this.chckbxmntmKNNClassifier.setSelected(false);
+		this.chckbxmntmBayesienneUniPresenceClassifier.setSelected(false);
+		this.chckbxmntmBayesienneUniFrequenceClassifier.setSelected(false);
+		this.chckbxmntmBayesienneBiPresenceClassifier.setSelected(false);
+		this.chckbxmntmBayesienneBiFrequenceClassifier.setSelected(false);
+		this.chckbxmntmBayesienneUniBiPresenceClassifier.setSelected(false);
+	}
+	
+	private void actionPerformedChckbxmntmEnableSave(ActionEvent e) {
+		this.btnSave.setEnabled(this.chckbxmntmEnableSave.getState());
+	}
+	
+	private void actionPerformedMntmClassifierShowStats(ActionEvent e) {
+    	new CrossValidationStats().main(null);
 	}
 }

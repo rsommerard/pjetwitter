@@ -23,7 +23,7 @@ public class Globals
 	public final static String NEGATIVE_FILE_PATH = "data/negative.txt";
 	
 
-	public final static int NON_ANNOTATED_TWEET = 1;
+	public final static int NON_ANNOTATED_TWEET = -1;
 	public final static int NEGATIVE_TWEET = 0;
 	public final static int NEUTRAL_TWEET = 2;
 	public final static int POSITIVE_TWEET = 4;

@@ -3,6 +3,7 @@ package helper;
 import helper.csv.CsvHelper;
 import helper.csv.CsvSingletons;
 
+import java.text.Normalizer;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -23,6 +24,21 @@ public class Utils
 
 
 		return null;
+	}
+
+	public static ArrayList<TweetInfo> getTweetsWithPolarity(List<TweetInfo> tweetsParam, int polarity)
+	{
+		ArrayList<TweetInfo> tweets = new ArrayList<TweetInfo>();
+
+		for (TweetInfo tweet : tweetsParam)
+		{
+			if (tweet.getTweetPolarity() == polarity)
+			{
+				tweets.add((TweetInfo) tweet.clone());
+			}
+		}
+
+		return tweets;
 	}
 
 	public static void removeAlreadyAnnotatedTweetsFrom(List<TweetInfo> liste)
@@ -52,7 +68,6 @@ public class Utils
 				// On peut ainsi modifier sa polarité sans le modifier par référence dans api
 				// (newTweets va être écrit dans csvBase, toutes les polaritées doivent être à NON_ANNOTATED)
 				TweetInfo clone = (TweetInfo) apiTweet.clone();
-				clone.setTweetPolarity(Globals.NON_ANNOTATED_TWEET);
 				newTweets.add(clone);
 			}
 
@@ -71,7 +86,6 @@ public class Utils
 					if (apiTweet.compareTo(newTweet) != 0)
 					{
 						TweetInfo clone = (TweetInfo) apiTweet.clone();
-						clone.setTweetPolarity(Globals.NON_ANNOTATED_TWEET);
 						newTweets.add(clone);
 					}
 				}
@@ -110,8 +124,33 @@ public class Utils
 		tweetText = regexRemoveMatched(tweetText, Globals.TWITTER_EMOTICON_REGEX);
 		tweetText = regexRemoveMatched(tweetText, Globals.TWITTER_URL_REGEX);
 
-		tweetText = tweetText.replace(";", "");
-		tweetText = tweetText.replace("@", "");
+		tweetText = tweetText.replace("\n", " ");
+
+
+		tweetText = Normalizer.normalize(tweetText, Normalizer.Form.NFD).replaceAll("[^\\p{ASCII}]", "");
+		tweetText = tweetText.toLowerCase();
+
+
+		// Suppression des caractères spéciaux (voir ascii)
+		for (int i = 33; i <= 38; i++)
+			tweetText = tweetText.replace(String.valueOf((char) i), "");
+		for (int i = 40; i <= 47; i++)
+			tweetText = tweetText.replace(String.valueOf((char) i), "");
+		for (int i = 58; i <= 64; i++)
+			tweetText = tweetText.replace(String.valueOf((char) i), "");
+		for (int i = 91; i <= 96; i++)
+			tweetText = tweetText.replace(String.valueOf((char) i), "");
+		for (int i = 123; i <= 126; i++)
+			tweetText = tweetText.replace(String.valueOf((char) i), "");
+
+		String[] tweetTextSplitted = tweetText.split(" ");
+		tweetText = "";
+		for (String str : tweetTextSplitted)
+		{
+			if (!str.equals(" ") && !str.equals(""))
+				tweetText += " " + str;
+		}
+
 		tweetText = tweetText.trim();
 
 		return tweetText;
@@ -121,7 +160,7 @@ public class Utils
 	{
 		Pattern pattern = Pattern.compile(regex);
 		Matcher matcher = pattern.matcher(text);
-		
+
 		while (matcher.find())
 		{
 			text = matcher.replaceAll("");
@@ -129,7 +168,41 @@ public class Utils
 
 		return text;
 	}
-	
+
+	public static int probabilitiesToTweetPolarity(double probNegative, double probNeutral, double probPositive, boolean invertResult)
+	{
+		if (invertResult)
+		{
+			double min = Math.min(probNegative, Math.min(probNeutral, probPositive));
+
+			if (probNegative == probNeutral && probNeutral == probPositive)
+				return Globals.NEUTRAL_TWEET;
+			else if (min == probNegative)
+				return Globals.NEGATIVE_TWEET;
+			else if (min == probPositive)
+				return Globals.POSITIVE_TWEET;
+			else
+				return Globals.NEUTRAL_TWEET;
+
+		}
+		else
+		{
+			double max = Math.max(probNegative, Math.max(probNeutral, probPositive));
+
+			if (probNegative == probNeutral && probNeutral == probPositive)
+				return Globals.NEUTRAL_TWEET;
+			else if (max == probNegative)
+				return Globals.NEGATIVE_TWEET;
+			else if (max == probPositive)
+				return Globals.POSITIVE_TWEET;
+			else
+				return Globals.NEUTRAL_TWEET;
+
+		}
+
+	}
+
+
 	public static String polarityToString(int polarity)
 	{
 		if (polarity == Globals.NEGATIVE_TWEET)
@@ -142,6 +215,12 @@ public class Utils
 			return "NonAnnotatedTweet";
 		else
 			return "<UnknownPolarity>";
+	}
+
+	public static double round(double a, int nbDecimals)
+	{
+		int val = (int) Math.pow(10, nbDecimals);
+		return (double) Math.round(a * val) / val;
 	}
 
 }

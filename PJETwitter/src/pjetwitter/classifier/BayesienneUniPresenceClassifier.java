@@ -1,12 +1,14 @@
 package pjetwitter.classifier;
 
 import helper.Globals;
+import helper.Utils;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import pjetwitter.TweetInfo;
 
-public class BayesienneClassifier {
+public class BayesienneUniPresenceClassifier {
 	private ArrayList<TweetInfo> positiveTweets;
 	private ArrayList<TweetInfo> negativeTweets;
 	private ArrayList<TweetInfo> neutralTweets;
@@ -15,8 +17,8 @@ public class BayesienneClassifier {
 	private ArrayList<String> negativeWords;
 	private ArrayList<String> neutralWords;
 	
-	public BayesienneClassifier() {
-		ArrayList<TweetInfo> listTweets = new ArrayList<TweetInfo>(helper.csv.CsvSingletons.getInstance().referenceCsv.readAll());
+	public BayesienneUniPresenceClassifier(List<TweetInfo> references) {
+		List<TweetInfo> listTweets = references;
 		
 		this.positiveTweets = new ArrayList<TweetInfo>();
 		this.negativeTweets = new ArrayList<TweetInfo>();
@@ -48,27 +50,49 @@ public class BayesienneClassifier {
 	
 	private void addWordsToNeutralList(String tweet) {
 		String[] words = tweet.split(" ");
-		for(String word : words) {
-			this.neutralWords.add(word);
+		
+		for(String str : words)
+		{
+			if(str.length() >= 3) {
+				this.neutralWords.add(str);
+			}
 		}
 	}
 	
 	private void addWordsToNegativeList(String tweet) {
 		String[] words = tweet.split(" ");
-		for(String word : words) {
-			this.negativeWords.add(word);
+		
+		for(String str : words)
+		{
+			if(str.length() >= 3) {
+				this.negativeWords.add(str);
+			}
 		}
 	}
 	
 	private void addWordsToPositiveList(String tweet) {
 		String[] words = tweet.split(" ");
-		for(String word : words) {
-			this.positiveWords.add(word);
+		
+		for(String str : words)
+		{
+			if(str.length() >= 3) {
+				this.positiveWords.add(str);
+			}
 		}
 	}
 
 	public int classify(String tweet) {
     	String[] words = tweet.split(" ");
+    	
+    	ArrayList<String> wordsRefreshed = new ArrayList<String>();
+		
+		for(String str : words)
+		{
+			if(str.length() >= 3) {
+				wordsRefreshed.add(str);
+			}
+		}
+    	
     	double probNegative = 0;
     	double probNeutral = 0;
     	double probPositive = 0;
@@ -76,9 +100,9 @@ public class BayesienneClassifier {
     	
     	//Negative
     	probNegative = (this.negativeTweets.size() / this.getNbTweets());
-    	for(String word : words) {
+    	for(String word : wordsRefreshed) {
     		double num = 1;
-    		double den = this.negativeTweets.size() + this.getNbWords();
+    		double den = this.negativeWords.size() + this.getNbWords();
     		for(String negativeWord : this.negativeWords) {
     			if(word.equals(negativeWord)) {
     				num++;
@@ -89,9 +113,9 @@ public class BayesienneClassifier {
     	
     	//Neutral
     	probNeutral = (this.neutralTweets.size() / this.getNbTweets());
-    	for(String word : words) {
+    	for(String word : wordsRefreshed) {
     		double num = 1;
-    		double den = this.neutralTweets.size() + this.getNbWords();
+    		double den = this.neutralWords.size() + this.getNbWords();
     		for(String neutralWord : this.neutralWords) {
     			if(word.equals(neutralWord)) {
     				num++;
@@ -102,9 +126,9 @@ public class BayesienneClassifier {
     	
     	//Positive
     	probPositive = (this.positiveTweets.size() / this.getNbTweets());
-    	for(String word : words) {
+    	for(String word : wordsRefreshed) {
     		double num = 1;
-    		double den = this.positiveTweets.size() + this.getNbWords();
+    		double den = this.positiveWords.size() + this.getNbWords();
     		for(String positiveWord : this.positiveWords) {
     			if(word.equals(positiveWord)) {
     				num++;
@@ -113,40 +137,9 @@ public class BayesienneClassifier {
     		probPositive *= (num/den);
     	}
     	
-    	System.out.println("probPositive: " + probPositive);
-    	System.out.println("probNeutral: " + probNeutral);
-    	System.out.println("probNegative: " + probNegative);
     	
-    	if(probNegative > probNeutral) {
-    		if(probNegative > probPositive) {
-    			return Globals.NEGATIVE_TWEET;
-    		}
-    	}
-    	
-    	if(probNeutral > probNegative) {
-    		if(probNeutral > probPositive) {
-    			return Globals.NEUTRAL_TWEET;
-    		}
-    	}
-    	
-    	if(probPositive > probNegative) {
-    		if(probPositive > probNeutral) {
-    			return Globals.POSITIVE_TWEET;
-    		}
-    	}
-    	
-    	return Globals.NON_ANNOTATED_TWEET;
-    }
-    
-    public static void main(String[] args) {
-    	String tweet1 = "This is a tweet.";
-    	String tweet2 = "This is a second good tweet.";
-    	String tweet3 = "This is a second bad tweet.";
-    	
-    	System.out.println("NON_ANNOTATED_TWEET = 1, NEGATIVE_TWEET = 0, NEUTRAL_TWEET = 2, POSITIVE_TWEET = 4");
-    	System.out.println("tweet1: \"" + tweet1 + "\" = " + new BayesienneClassifier().classify(tweet1));
-    	System.out.println("tweet2: \"" + tweet2 + "\" = " + new BayesienneClassifier().classify(tweet2));
-    	System.out.println("tweet3: \"" + tweet3 + "\" = " + new BayesienneClassifier().classify(tweet3));
+    	return Utils.probabilitiesToTweetPolarity(probNegative, probNeutral, probPositive, false);
+		
     }
 	
 	private double getNbTweets() {

@@ -69,15 +69,4 @@ public class KeywordsClassifier {
     	
     	return Globals.NEUTRAL_TWEET;
     }
-    
-    public static void main(String[] args) {
-    	String tweet1 = "This is a tweet.";
-    	String tweet2 = "This is a second good tweet.";
-    	String tweet3 = "This is a second bad tweet.";
-    	
-    	System.out.println("NON_ANNOTATED_TWEET = 1, NEGATIVE_TWEET = 0, NEUTRAL_TWEET = 2, POSITIVE_TWEET = 4");
-    	System.out.println("tweet1: \"" + tweet1 + "\" = " + new KeywordsClassifier().classify(tweet1));
-    	System.out.println("tweet2: \"" + tweet2 + "\" = " + new KeywordsClassifier().classify(tweet2));
-    	System.out.println("tweet3: \"" + tweet3 + "\" = " + new KeywordsClassifier().classify(tweet3));
-    }
 }
